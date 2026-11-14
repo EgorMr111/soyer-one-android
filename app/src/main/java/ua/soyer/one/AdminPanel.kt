@@ -64,6 +64,10 @@ data class SoyerSettings(
     }
 }
 
+fun formatRequestAmount(raw: String): String = runCatching {
+    java.math.BigDecimal(raw.trim()).stripTrailingZeros().toPlainString().replace('.', ',')
+}.getOrDefault(raw)
+
 fun formatSoyerRate(value: Double): String =
     String.format(Locale.US, "%.2f", value).replace('.', ',')
 
@@ -187,7 +191,7 @@ fun AdminPanel(
                 val id = item.optString("id")
                 Column(Modifier.fillMaxWidth().background(Color(0xFF111722), RoundedCornerShape(16.dp)).padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("#" + id + " · " + item.optString("firstName").ifBlank { "Клієнт" }, color = Color(0xFFF5F7FB), fontWeight = FontWeight.Bold)
-                    Text(item.optString("amountFrom") + " " + (if (item.optString("direction") == "USDT_TO_UAH") "USDT → UAH " else "UAH → USDT ") + item.optString("amountTo"), color = Color(0xFF6C8CFF), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    Text(formatRequestAmount(item.optString("amountFrom")) + " " + (if (item.optString("direction") == "USDT_TO_UAH") "USDT → UAH " else "UAH → USDT ") + formatRequestAmount(item.optString("amountTo")), color = Color(0xFF6C8CFF), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                     Text("Telegram ID: " + item.optString("telegramUserId") + " · Статус: " + item.optString("status"), color = Color(0xFF8D98AA), fontSize = 11.sp)
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         listOf("processing" to "В обробці", "completed" to "Готово", "cancelled" to "Скасувати").forEach { (nextStatus, label) ->
