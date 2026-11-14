@@ -99,7 +99,7 @@ fun SoyerApp() {
                         Triple("Головна", Icons.Filled.Home, 0),
                         Triple("Калькулятор", Icons.Filled.Calculate, 1),
                         Triple("Історія", Icons.Filled.History, 2),
-                        Triple("Профіль", Icons.Filled.Person, 3)
+                        Triple("Адмін", Icons.Filled.SupportAgent, 3)
                     )
                     items.forEach { (label, icon, index) ->
                         NavigationBarItem(
@@ -120,17 +120,17 @@ fun SoyerApp() {
             }
         ) { padding ->
             when (selectedTab) {
-                0 -> HomeScreen(Modifier.padding(padding), onCalculate = { selectedTab = 1 })
-                1 -> CalculatorScreen(Modifier.padding(padding), onSave = ::saveHistory)
+                0 -> HomeScreen(Modifier.padding(padding), onCalculate = { selectedTab = 1 }, settings = settings)
+                1 -> CalculatorScreen(Modifier.padding(padding), onSave = ::saveHistory, settings = settings)
                 2 -> HistoryScreen(Modifier.padding(padding), historyItems)
-                else -> InfoScreen(Modifier.padding(padding), "Профіль", "SOYER ONE — інформаційний застосунок SOYER EXCHANGE. Зараз доступні демонстраційні курси та локальна історія розрахунків.")
+                else -> AdminPanel(Modifier.padding(padding), current = settings, onSettingsUpdated = { settings = it })
             }
         }
     }
 }
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit) {
+fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, settings: SoyerSettings = SoyerSettings()) {
     val context = LocalContext.current
     fun openTelegram(username: String) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/$username"))) }
     Column(
@@ -254,16 +254,16 @@ fun FeatureRow(title: String, subtitle: String) {
 }
 
 @Composable
-fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {}) {
+fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {}, settings: SoyerSettings = SoyerSettings()) {
     var direction by remember { mutableStateOf(true) }
     var give by remember { mutableStateOf("100") }
     var receive by remember { mutableStateOf("4660") }
-    val rate = if (direction) 46.50 else 1.0 / 47.70
+    val rate = if (direction) settings.rateUsdtToUah else 1.0 / settings.rateUahToUsdt
     val formatter = remember { DecimalFormat("#,##0.00", DecimalFormatSymbols(Locale.US)) }
     fun formatAmount(value: Double): String = formatter.format(value).replace(",", " ").replace(".", ",")
     val giveAmount = give.filterNot { it.isWhitespace() }.replace(',', '.').toDoubleOrNull()
     val receiveAmount = receive.filterNot { it.isWhitespace() }.replace(',', '.').toDoubleOrNull()
-    val minimumMet = if (direction) (giveAmount ?: 0.0) >= 10.0 else (receiveAmount ?: 0.0) >= 10.0
+    val minimumMet = if (direction) (giveAmount ?: 0.0) >= settings.minimumUsdt else (giveAmount ?: 0.0) >= settings.minimumUsdt * settings.rateUahToUsdt
 
     fun updateGive(value: String) {
         give = value
