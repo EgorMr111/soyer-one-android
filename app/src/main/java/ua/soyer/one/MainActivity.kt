@@ -13,7 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownUp
+import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -148,7 +148,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit) {
                     Text("46,60 ₴", color = MainText, fontSize = 26.sp, fontWeight = FontWeight.Bold)
                 }
                 Box(Modifier.size(42.dp).clip(CircleShape).background(GreenDark), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.ArrowDownUp, contentDescription = null, tint = Green)
+                    Icon(Icons.Filled.SwapVert, contentDescription = null, tint = Green)
                 }
                 Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {
                     Text("UAH → USDT", color = Muted, fontSize = 13.sp)
@@ -166,7 +166,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit) {
         ) {
             Text("Відкрити калькулятор", fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Spacer(Modifier.width(8.dp))
-            Icon(Icons.Filled.ArrowDownUp, contentDescription = null)
+            Icon(Icons.Filled.SwapVert, contentDescription = null)
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -232,7 +232,7 @@ fun CalculatorScreen(modifier: Modifier = Modifier) {
         AmountCard("ВІДДАЮ", if (direction) "USDT" else "UAH", give, { updateGive(it) })
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Box(Modifier.size(42.dp).clip(CircleShape).background(GreenDark), contentAlignment = Alignment.Center) {
-                Icon(Icons.Filled.ArrowDownUp, contentDescription = null, tint = Green)
+                Icon(Icons.Filled.SwapVert, contentDescription = null, tint = Green)
             }
         }
         AmountCard("ОТРИМУЮ", if (direction) "UAH" else "USDT", receive, { updateReceive(it) })
