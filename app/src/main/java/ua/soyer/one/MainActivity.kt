@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +52,18 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SoyerApp() {
     var selectedTab by remember { mutableIntStateOf(0) }
+    val context = LocalContext.current
+    val preferences = remember { context.getSharedPreferences("soyer_one", android.content.Context.MODE_PRIVATE) }
+    val historyItems = remember {
+        mutableStateListOf<String>().apply {
+            addAll(preferences.getString("history", "").orEmpty().lines().filter { it.isNotBlank() })
+        }
+    }
+    fun saveHistory(entry: String) {
+        historyItems.add(0, entry)
+        if (historyItems.size > 50) historyItems.removeAt(historyItems.lastIndex)
+        preferences.edit().putString("history", historyItems.joinToString("\n")).apply()
+    }
     MaterialTheme(
         colorScheme = darkColorScheme(
             background = Background,
@@ -94,8 +107,8 @@ fun SoyerApp() {
         ) { padding ->
             when (selectedTab) {
                 0 -> HomeScreen(Modifier.padding(padding), onCalculate = { selectedTab = 1 })
-                1 -> CalculatorScreen(Modifier.padding(padding))
-                2 -> InfoScreen(Modifier.padding(padding), "Історія", "Тут відображатимуться ваші останні розрахунки.")
+                1 -> CalculatorScreen(Modifier.padding(padding), onSave = ::saveHistory)
+                2 -> HistoryScreen(Modifier.padding(padding), historyItems)
                 else -> InfoScreen(Modifier.padding(padding), "Профіль", "Налаштування профілю та підтримка SOYER ONE.")
             }
         }
@@ -197,7 +210,7 @@ fun FeatureRow(title: String, subtitle: String) {
 }
 
 @Composable
-fun CalculatorScreen(modifier: Modifier = Modifier) {
+fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {}) {
     var direction by remember { mutableStateOf(true) }
     var give by remember { mutableStateOf("100") }
     var receive by remember { mutableStateOf("4660") }
@@ -240,6 +253,53 @@ fun CalculatorScreen(modifier: Modifier = Modifier) {
             Text("ІНДИКАТИВНИЙ КУРС", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Text(if (direction) "1 USDT = 46,60 UAH" else "1 USDT = 47,70 UAH", color = Green, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text("Тестові значення для демонстрації інтерфейсу.", color = Muted, fontSize = 11.sp)
+        }
+        Button(
+            onClick = {
+                val from = if (direction) "USDT" else "UAH"
+                val to = if (direction) "UAH" else "USDT"
+                onSave("$give $from → $receive $to")
+            },
+            enabled = give.isNotBlank() && receive.isNotBlank(),
+            modifier = Modifier.fillMaxWidth().height(52.dp),
+            shape = RoundedCornerShape(15.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Green, contentColor = Background)
+        ) {
+            Text("Зберегти розрахунок", fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+fun HistoryScreen(modifier: Modifier = Modifier, items: List<String>) {
+    Column(
+        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        Spacer(Modifier.height(8.dp))
+        Text("Історія", color = MainText, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
+        Text("Збережені розрахунки на цьому пристрої.", color = Muted, fontSize = 14.sp)
+        if (items.isEmpty()) {
+            Box(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Surface).padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Поки що немає збережених розрахунків.", color = Muted, fontSize = 13.sp)
+            }
+        } else {
+            items.forEachIndexed { index, item ->
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(15.dp)).background(Surface)
+                        .border(1.dp, Border, RoundedCornerShape(15.dp)).padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(Modifier.size(34.dp).clip(CircleShape).background(GreenDark), contentAlignment = Alignment.Center) {
+                        Text("\${index + 1}", color = Green, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Text(item, color = MainText, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                }
+            }
         }
     }
 }
