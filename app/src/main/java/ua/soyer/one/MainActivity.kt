@@ -243,8 +243,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, onAdminOp
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Вітаємо у", color = Muted, fontSize = 16.sp)
-            Text("SOYER ONE", color = MainText, fontSize = 32.sp, fontWeight = FontWeight.ExtraBold)
+            Text(settings.heroTitle, color = MainText, fontSize = 27.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 33.sp)
             Text(settings.heroText, color = Muted, fontSize = 14.sp, lineHeight = 21.sp)
         }
 
@@ -341,6 +340,9 @@ fun FeatureRow(title: String, subtitle: String) {
 
 @Composable
 fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {}, settings: SoyerSettings = SoyerSettings()) {
+    val requestScope = rememberCoroutineScope()
+    var requestBusy by remember { mutableStateOf(false) }
+    var requestMessage by remember { mutableStateOf("") }
     var direction by remember { mutableStateOf(true) }
     var give by remember { mutableStateOf("100") }
     var receive by remember { mutableStateOf("4660") }
@@ -402,6 +404,31 @@ fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {
         ) {
             Text("Зберегти розрахунок", fontWeight = FontWeight.Bold)
         }
+        Button(
+            onClick = {
+                val fromAmount = giveAmount ?: 0.0
+                val toAmount = receiveAmount ?: 0.0
+                requestScope.launch {
+                    requestBusy = true
+                    requestMessage = ""
+                    try {
+                        val payload = JSONObject()
+                            .put("direction", if (direction) "USDT_TO_UAH" else "UAH_TO_USDT")
+                            .put("amountFrom", fromAmount)
+                            .put("amountTo", toAmount)
+                        soyerApiRequest("/api/requests", "POST", payload)
+                        requestMessage = "Заявку створено. Менеджер зв’яжеться з вами в Telegram."
+                    } catch (e: Exception) {
+                        requestMessage = e.message ?: "Не вдалося створити заявку."
+                    } finally { requestBusy = false }
+                }
+            },
+            enabled = give.isNotBlank() && receive.isNotBlank() && minimumMet && !requestBusy,
+            modifier = Modifier.fillMaxWidth().height(52.dp),
+            shape = RoundedCornerShape(15.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = AccentGreen, contentColor = Background)
+        ) { Text(if (requestBusy) "Надсилання..." else "Створити заявку", fontWeight = FontWeight.Bold) }
+        if (requestMessage.isNotBlank()) Text(requestMessage, color = if (requestMessage.startsWith("Заявку")) AccentGreen else Color(0xFFFF9A9A), fontSize = 12.sp, lineHeight = 18.sp)
         if (!minimumMet) {
             Text("Мінімальна сума — ${formatSoyerRate(settings.minimumUsdt)} USDT. Змініть суму, щоб зберегти розрахунок.", color = Color(0xFFFFC36B), fontSize = 12.sp, lineHeight = 18.sp)
         }
