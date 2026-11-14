@@ -51,6 +51,7 @@ private val Border = Color(0xFF26372E)
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSoyerCookieManager()
         setContent { SoyerApp() }
     }
 }
@@ -58,7 +59,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SoyerApp() {
     var selectedTab by remember { mutableIntStateOf(0) }
+    var settings by remember { mutableStateOf(SoyerSettings()) }
     val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        while (true) {
+            try { settings = SoyerSettings.from(soyerApiRequest("/api/settings")) } catch (_: Exception) { }
+            kotlinx.coroutines.delay(60_000)
+        }
+    }
     val preferences = remember { context.getSharedPreferences("soyer_one", android.content.Context.MODE_PRIVATE) }
     val historyItems = remember {
         mutableStateListOf<String>().apply {
