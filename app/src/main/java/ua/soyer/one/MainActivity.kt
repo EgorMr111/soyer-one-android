@@ -476,6 +476,42 @@ fun AmountCard(label: String, currency: String, value: String, onValueChange: (S
     }
 }
 
+
+@Composable
+fun ProfileScreen(
+    modifier: Modifier = Modifier,
+    telegramName: String,
+    telegramUsername: String,
+    telegramId: String,
+    onLogout: () -> Unit
+) {
+    Column(
+        modifier.fillMaxSize().background(Background).verticalScroll(rememberScrollState()).padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Spacer(Modifier.height(8.dp))
+        Text("Профіль", color = MainText, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
+        Column(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Surface)
+                .border(1.dp, Border, RoundedCornerShape(20.dp)).padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text("TELEGRAM АККАУНТ", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(telegramName.ifBlank { "Користувач Telegram" }, color = MainText, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            if (telegramUsername.isNotBlank()) Text("@$telegramUsername", color = Green, fontSize = 14.sp)
+            Text("ID: $telegramId", color = Muted, fontSize = 12.sp)
+            Text("Авторизація активна", color = AccentGreen, fontSize = 12.sp)
+        }
+        OutlinedButton(
+            onClick = onLogout,
+            modifier = Modifier.fillMaxWidth().height(52.dp),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Text("Вийти з акаунта", color = MainText, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
 @Composable
 fun InfoScreen(modifier: Modifier = Modifier, title: String, description: String) {
     Column(modifier.fillMaxSize().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
