@@ -174,40 +174,30 @@ fun AdminPanel(
         if (!authenticated) {
             Column(
                 Modifier.fillMaxWidth().background(Color(0xFF111722), RoundedCornerShape(18.dp)).padding(18.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Text("Вхід адміністратора", color = Color(0xFFF5F7FB), fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Пароль адміністратора") },
-                    singleLine = true,
-                    visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Button(
-                    onClick = {
-                        scope.launch {
-                            busy = true
-                            error = ""
-                            try {
-                                val login = soyerApiRequest("/api/admin/login", "POST", JSONObject().put("password", password))
-                                soyerAdminToken = login.optString("token")
-                                if (soyerAdminToken.isBlank()) throw IllegalStateException("Сервер не повернув токен авторизації. Оновіть API.")
-                                authenticated = true
-                                password = ""
-                                loadSettings()
-                            } catch (e: Exception) {
-                                error = e.message ?: "Не вдалося увійти."
-                            } finally { busy = false }
-                        }
-                    },
-                    enabled = password.isNotBlank() && !busy,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6C8CFF), contentColor = Color(0xFF080A0F))
-                ) { Text(if (busy) "Перевірка..." else "Увійти") }
+                Text("Доступ обмежено", color = Color(0xFFF5F7FB), fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text("Адмін-панель доступна лише Telegram-акаунту, який доданий до ADMIN_IDS на сервері.", color = Color(0xFF8D98AA), fontSize = 13.sp, lineHeight = 19.sp)
             }
         } else {
+            Text("ЗАЯВКИ КЛІЄНТІВ", color = Color(0xFF8D98AA), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            OutlinedButton(onClick = { scope.launch { try { loadRequests() } catch (e: Exception) { error = e.message ?: "Помилка завантаження заявок." } } }, modifier = Modifier.fillMaxWidth()) { Text("Оновити заявки") }
+            if (requests.isEmpty()) Text("Заявок поки немає.", color = Color(0xFF8D98AA), fontSize = 12.sp)
+            requests.forEach { item ->
+                val id = item.optString("id")
+                Column(Modifier.fillMaxWidth().background(Color(0xFF111722), RoundedCornerShape(16.dp)).padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("#" + id + " · " + item.optString("firstName").ifBlank { "Клієнт" }, color = Color(0xFFF5F7FB), fontWeight = FontWeight.Bold)
+                    Text(item.optString("amountFrom") + " " + (if (item.optString("direction") == "USDT_TO_UAH") "USDT → UAH " else "UAH → USDT ") + item.optString("amountTo"), color = Color(0xFF6C8CFF), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Telegram ID: " + item.optString("telegramUserId") + " · Статус: " + item.optString("status"), color = Color(0xFF8D98AA), fontSize = 11.sp)
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        listOf("processing" to "В обробці", "completed" to "Готово", "cancelled" to "Скасувати").forEach { (nextStatus, label) ->
+                            TextButton(onClick = { scope.launch { try { soyerApiRequest("/api/admin/requests/" + id, "PATCH", JSONObject().put("status", nextStatus)); loadRequests() } catch (e: Exception) { error = e.message ?: "Помилка статусу." } } }) { Text(label, fontSize = 10.sp) }
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            Text("НАЛАШТУВАННЯ КУРСУ", color = Color(0xFF8D98AA), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             AdminInput("USDT → UAH", rateSell, { rateSell = it }, KeyboardType.Decimal)
             AdminInput("UAH → USDT", rateBuy, { rateBuy = it }, KeyboardType.Decimal)
             AdminInput("Мінімум (USDT)", minimum, { minimum = it }, KeyboardType.Decimal)
