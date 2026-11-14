@@ -9,10 +9,11 @@ Native Android application built with Kotlin and Jetpack Compose.
 - USDT ↔ UAH calculator using the current server settings.
 - Local calculation history saved on the device.
 - Company, partnership, promotions and Telegram contact information.
-- Server-backed administrator panel in the **Адмін** tab.
-- Admin login uses the same server-side password as the SOYER EXCHANGE website; no password is embedded in the APK.
+- Hidden administrator entry (seven taps on the logo); server verifies the signed-in Telegram ID against `ADMIN_IDS`.
+- Create exchange requests from the calculator and store them on the API server.
+- Admin can review requests and change their status (new, processing, completed, cancelled).
 - Admin changes are saved through the SOYER API and are visible to Android users on refresh (the app refreshes settings every 60 seconds).
-- Dark forest-green interface.
+- Dark interface matching the website palette: `#080A0F`, `#111722`, blue/violet accents and mint status indicators.
 
 ## API
 
@@ -20,7 +21,7 @@ The Android client currently connects to:
 
 `https://soyer-exchange-api.onrender.com`
 
-The API server must be deployed from the `EgorMr111/soyer-exchange` repository. The app uses the existing routes `/api/settings`, `/api/admin/login`, `/api/admin/me`, `/api/admin/settings` and `/api/admin/logout`.
+The API server must be deployed from the `EgorMr111/soyer-exchange` repository. The app uses `/api/settings`, `/api/auth/telegram`, `/api/auth/me`, `/api/requests`, `/api/admin/me`, `/api/admin/requests`, `/api/admin/requests/:id` and `/api/admin/settings`.
 
 ## Build
 
@@ -35,4 +36,4 @@ GitHub Actions builds a debug APK on every push to `main`. The artifact is named
 
 ## Important
 
-The displayed rates are informational quotes and do not execute an exchange. The app does not accept payments, connect wallets or exchanges, or execute transfers. Calculation history is stored locally on the device and is not synchronized.
+The app does not accept payments, connect wallets or exchanges, or execute transfers. An exchange request is a contact/request record only; final terms must be confirmed with the service team. Calculation history remains local to the device.
