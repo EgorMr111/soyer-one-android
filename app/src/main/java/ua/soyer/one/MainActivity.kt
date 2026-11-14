@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -250,20 +251,21 @@ fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {
     var give by remember { mutableStateOf("100") }
     var receive by remember { mutableStateOf("4660") }
     val rate = if (direction) 46.50 else 1.0 / 47.70
-    val formatter = remember { DecimalFormat("#,##0.00") }
-    val giveAmount = give.replace(" ", "").replace(',', '.').toDoubleOrNull()
-    val receiveAmount = receive.replace(" ", "").replace(',', '.').toDoubleOrNull()
+    val formatter = remember { DecimalFormat("#,##0.00", DecimalFormatSymbols(Locale.US)) }
+    fun formatAmount(value: Double): String = formatter.format(value).replace(",", " ").replace(".", ",")
+    val giveAmount = give.filterNot { it.isWhitespace() }.replace(',', '.').toDoubleOrNull()
+    val receiveAmount = receive.filterNot { it.isWhitespace() }.replace(',', '.').toDoubleOrNull()
     val minimumMet = if (direction) (giveAmount ?: 0.0) >= 10.0 else (receiveAmount ?: 0.0) >= 10.0
 
     fun updateGive(value: String) {
         give = value
-        val amount = value.replace(',', '.').toDoubleOrNull()
-        receive = amount?.let { formatter.format(it * rate).replace(",", " ").replace(".", ",") } ?: ""
+        val amount = value.filterNot { it.isWhitespace() }.replace(',', '.').toDoubleOrNull()
+        receive = amount?.let { formatAmount(it * rate) } ?: ""
     }
     fun updateReceive(value: String) {
         receive = value
-        val amount = value.replace(" ", "").replace(',', '.').toDoubleOrNull()
-        give = amount?.let { formatter.format(it / rate).replace(",", " ").replace(".", ",") } ?: ""
+        val amount = value.filterNot { it.isWhitespace() }.replace(',', '.').toDoubleOrNull()
+        give = amount?.let { formatAmount(it / rate) } ?: ""
     }
 
     Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
