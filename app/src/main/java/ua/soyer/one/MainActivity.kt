@@ -136,7 +136,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(7.dp).clip(CircleShape).background(Green))
                     Spacer(Modifier.width(7.dp))
-                    Text("ОНЛАЙН", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text("ДЕМО", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -294,7 +294,7 @@ fun HistoryScreen(modifier: Modifier = Modifier, items: List<String>) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(Modifier.size(34.dp).clip(CircleShape).background(GreenDark), contentAlignment = Alignment.Center) {
-                        Text("\${index + 1}", color = Green, fontWeight = FontWeight.Bold)
+                        Text("${index + 1}", color = Green, fontWeight = FontWeight.Bold)
                     }
                     Spacer(Modifier.width(12.dp))
                     Text(item, color = MainText, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
