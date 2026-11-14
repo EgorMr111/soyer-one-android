@@ -1,7 +1,6 @@
 package ua.soyer.one
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.os.Handler
 import android.os.Looper
 import android.webkit.JavascriptInterface
@@ -30,7 +29,6 @@ import org.json.JSONObject
 private const val TELEGRAM_LOGIN_URL = "https://soyer-exchange-api.onrender.com/telegram-login"
 
 private class SoyerTelegramBridge(
-    private val activity: Activity,
     private val onAuthenticated: (JSONObject) -> Unit
 ) {
     @JavascriptInterface
@@ -74,10 +72,14 @@ fun TelegramAuthScreen(onAuthenticated: (JSONObject) -> Unit) {
                         settings.domStorageEnabled = true
                         settings.allowFileAccess = false
                         settings.allowContentAccess = false
-                        webViewClient = WebViewClient()
+                        webViewClient = object : WebViewClient() {
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                loading = false
+                            }
+                        }
                         webChromeClient = WebChromeClient()
                         addJavascriptInterface(
-                            SoyerTelegramBridge(context as Activity, onAuthenticated),
+                            SoyerTelegramBridge(onAuthenticated),
                             "SoyerTelegramBridge"
                         )
                         loadUrl(TELEGRAM_LOGIN_URL)
