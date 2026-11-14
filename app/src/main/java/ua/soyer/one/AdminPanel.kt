@@ -78,7 +78,7 @@ suspend fun soyerApiRequest(path: String, method: String = "GET", body: JSONObje
             if (path.startsWith("/api/admin/") && soyerAdminToken.isNotBlank()) {
                 connection.setRequestProperty("Authorization", "Bearer $soyerAdminToken")
             }
-            if (path.startsWith("/api/auth/") && soyerUserToken.isNotBlank()) {
+            if ((path.startsWith("/api/auth/") || path.startsWith("/api/requests") || path.startsWith("/api/admin/")) && soyerUserToken.isNotBlank() && soyerAdminToken.isBlank()) {
                 connection.setRequestProperty("Authorization", "Bearer $soyerUserToken")
             }
             if (body != null) {
@@ -122,9 +122,16 @@ fun AdminPanel(
     var exchangeUrl by remember { mutableStateOf(current.exchangeUrl) }
     var projectsUrl by remember { mutableStateOf(current.projectsUrl) }
     var rawSettings by remember { mutableStateOf(JSONObject()) }
+    var requests by remember { mutableStateOf(emptyList<JSONObject>()) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
+
+    suspend fun loadRequests() {
+        val response = soyerApiRequest("/api/admin/requests")
+        val array = response.optJSONArray("requests") ?: org.json.JSONArray()
+        requests = (0 until array.length()).mapNotNull { array.optJSONObject(it) }
+    }
 
     suspend fun loadSettings() {
         val json = soyerApiRequest("/api/settings")
@@ -149,6 +156,7 @@ fun AdminPanel(
             soyerApiRequest("/api/admin/me")
             authenticated = true
             loadSettings()
+            loadRequests()
         } catch (_: Exception) { }
     }
 
