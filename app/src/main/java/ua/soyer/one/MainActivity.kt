@@ -40,6 +40,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import org.json.JSONObject
+import kotlinx.coroutines.launch
 
 private val Background = Color(0xFF080A0F)
 private val Surface = Color(0xFF111722)
@@ -65,6 +66,7 @@ class MainActivity : ComponentActivity() {
 fun SoyerRoot() {
     val context = LocalContext.current
     val preferences = remember { context.getSharedPreferences("soyer_one", android.content.Context.MODE_PRIVATE) }
+    val authScope = rememberCoroutineScope()
     var token by remember { mutableStateOf(preferences.getString("telegram_token", "").orEmpty()) }
     var firstName by remember { mutableStateOf(preferences.getString("telegram_first_name", "").orEmpty()) }
     var username by remember { mutableStateOf(preferences.getString("telegram_username", "").orEmpty()) }
@@ -113,10 +115,13 @@ fun SoyerRoot() {
             telegramUsername = username,
             telegramId = telegramId,
             onLogout = {
-                token = ""
-                soyerUserToken = ""
-                preferences.edit().remove("telegram_token").remove("telegram_first_name")
-                    .remove("telegram_username").remove("telegram_id").apply()
+                authScope.launch {
+                    try { soyerApiRequest("/api/auth/logout", "POST") } catch (_: Exception) { }
+                    token = ""
+                    soyerUserToken = ""
+                    preferences.edit().remove("telegram_token").remove("telegram_first_name")
+                        .remove("telegram_username").remove("telegram_id").apply()
+                }
             }
         )
     }
