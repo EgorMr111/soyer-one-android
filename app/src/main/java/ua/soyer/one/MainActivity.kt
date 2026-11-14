@@ -34,6 +34,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 private val Background = Color(0xFF080D0B)
 private val Surface = Color(0xFF111A16)
@@ -111,7 +114,7 @@ fun SoyerApp() {
                 0 -> HomeScreen(Modifier.padding(padding), onCalculate = { selectedTab = 1 })
                 1 -> CalculatorScreen(Modifier.padding(padding), onSave = ::saveHistory)
                 2 -> HistoryScreen(Modifier.padding(padding), historyItems)
-                else -> InfoScreen(Modifier.padding(padding), "Профіль", "Налаштування профілю та підтримка SOYER ONE.")
+                else -> InfoScreen(Modifier.padding(padding), "Профіль", "SOYER ONE — інформаційний застосунок SOYER EXCHANGE. Зараз доступні демонстраційні курси та локальна історія розрахунків.")
             }
         }
     }
@@ -248,6 +251,9 @@ fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {
     var receive by remember { mutableStateOf("4660") }
     val rate = if (direction) 46.50 else 1.0 / 47.70
     val formatter = remember { DecimalFormat("#,##0.00") }
+    val giveAmount = give.replace(" ", "").replace(',', '.').toDoubleOrNull()
+    val receiveAmount = receive.replace(" ", "").replace(',', '.').toDoubleOrNull()
+    val minimumMet = if (direction) (giveAmount ?: 0.0) >= 10.0 else (receiveAmount ?: 0.0) >= 10.0
 
     fun updateGive(value: String) {
         give = value
@@ -290,14 +296,18 @@ fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {
             onClick = {
                 val from = if (direction) "USDT" else "UAH"
                 val to = if (direction) "UAH" else "USDT"
-                onSave("$give $from → $receive $to")
+                val timestamp = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale("uk", "UA")).format(Date())
+                onSave("$give $from → $receive $to · $timestamp")
             },
-            enabled = give.isNotBlank() && receive.isNotBlank(),
+            enabled = give.isNotBlank() && receive.isNotBlank() && minimumMet,
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = RoundedCornerShape(15.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Green, contentColor = Background)
         ) {
             Text("Зберегти розрахунок", fontWeight = FontWeight.Bold)
+        }
+        if (!minimumMet) {
+            Text("Мінімальна сума — 10 USDT. Змініть суму, щоб зберегти розрахунок.", color = Color(0xFFFFC36B), fontSize = 12.sp, lineHeight = 18.sp)
         }
     }
 }
