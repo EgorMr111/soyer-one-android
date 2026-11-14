@@ -12,7 +12,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -46,7 +45,6 @@ private class SoyerTelegramBridge(
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun TelegramAuthScreen(onAuthenticated: (JSONObject) -> Unit) {
-    val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
     Column(
         Modifier.fillMaxSize().background(Color(0xFF080A0F)).padding(22.dp),
@@ -69,12 +67,17 @@ fun TelegramAuthScreen(onAuthenticated: (JSONObject) -> Unit) {
                 factory = { viewContext ->
                     WebView(viewContext).apply {
                         settings.javaScriptEnabled = true
+                        settings.javaScriptCanOpenWindowsAutomatically = true
+                        settings.setSupportMultipleWindows(false)
                         settings.domStorageEnabled = true
                         settings.allowFileAccess = false
                         settings.allowContentAccess = false
                         webViewClient = object : WebViewClient() {
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 loading = false
+                            }
+                            override fun onReceivedError(view: WebView?, request: android.webkit.WebResourceRequest?, error: android.webkit.WebResourceError?) {
+                                if (request?.isForMainFrame == true) loading = false
                             }
                         }
                         webChromeClient = WebChromeClient()
