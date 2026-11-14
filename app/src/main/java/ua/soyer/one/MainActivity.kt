@@ -98,8 +98,7 @@ fun SoyerApp() {
                     val items = listOf(
                         Triple("Головна", Icons.Filled.Home, 0),
                         Triple("Калькулятор", Icons.Filled.Calculate, 1),
-                        Triple("Історія", Icons.Filled.History, 2),
-                        Triple("Адмін", Icons.Filled.SupportAgent, 3)
+                        Triple("Історія", Icons.Filled.History, 2)
                     )
                     items.forEach { (label, icon, index) ->
                         NavigationBarItem(
@@ -120,7 +119,7 @@ fun SoyerApp() {
             }
         ) { padding ->
             when (selectedTab) {
-                0 -> HomeScreen(Modifier.padding(padding), onCalculate = { selectedTab = 1 }, settings = settings)
+                0 -> HomeScreen(Modifier.padding(padding), onCalculate = { selectedTab = 1 }, onAdminOpen = { selectedTab = 3 }, settings = settings)
                 1 -> CalculatorScreen(Modifier.padding(padding), onSave = ::saveHistory, settings = settings)
                 2 -> HistoryScreen(Modifier.padding(padding), historyItems)
                 else -> AdminPanel(Modifier.padding(padding), current = settings, onSettingsUpdated = { settings = it })
@@ -130,8 +129,9 @@ fun SoyerApp() {
 }
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, settings: SoyerSettings = SoyerSettings()) {
+fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, onAdminOpen: () -> Unit = {}, settings: SoyerSettings = SoyerSettings()) {
     val context = LocalContext.current
+    var logoTaps by remember { mutableIntStateOf(0) }
     fun openTelegram(username: String) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/$username"))) }
     Column(
         modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
@@ -139,7 +139,17 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, settings:
     ) {
         Spacer(Modifier.height(16.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(42.dp).clip(RoundedCornerShape(14.dp)).background(GreenDark), contentAlignment = Alignment.Center) {
+            Box(
+                Modifier.size(42.dp).clip(RoundedCornerShape(14.dp)).background(GreenDark)
+                    .clickable {
+                        logoTaps += 1
+                        if (logoTaps >= 7) {
+                            logoTaps = 0
+                            onAdminOpen()
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
                 Text("S", color = Green, fontSize = 25.sp, fontWeight = FontWeight.Black)
             }
             Spacer(Modifier.width(12.dp))
