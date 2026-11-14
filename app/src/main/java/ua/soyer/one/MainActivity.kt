@@ -200,6 +200,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, settings:
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("ПРО SOYER EXCHANGE", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+            Text(settings.aboutText, color = MainText, fontSize = 13.sp, lineHeight = 19.sp)
             FeatureRow("Зручність", "USDT через блокчейн-мережі або UID бірж")
             FeatureRow("Особисті рахунки", "Перекази з особистих рахунків команди")
             FeatureRow("Прозорі умови", "Курс та умови погоджуються перед угодою")
