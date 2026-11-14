@@ -253,24 +253,16 @@ fun AdminPanel(
 
             OutlinedButton(
                 onClick = {
-                    scope.launch {
-                        busy = true
-                        try {
-                            soyerApiRequest("/api/admin/logout", "POST")
-                            soyerAdminToken = ""
-                            authenticated = false
-                            message = "Ви вийшли з адмін-панелі."
-                        } catch (e: Exception) {
-                            error = e.message ?: "Помилка виходу."
-                        } finally { busy = false }
-                    }
+                    soyerAdminToken = ""
+                    authenticated = false
+                    message = "Адмін-панель закрито."
                 },
                 modifier = Modifier.fillMaxWidth()
-            ) { Text("Вийти") }
+            ) { Text("Закрити адмін-панель") }
         }
         if (error.isNotBlank()) Text(error, color = Color(0xFFFF9A9A), fontSize = 12.sp)
         if (message.isNotBlank()) Text(message, color = Color(0xFF6C8CFF), fontSize = 12.sp)
-        Text("Пароль перевіряється сервером і не зберігається в APK.", color = Color(0xFF8D98AA), fontSize = 11.sp)
+        Text("Права адміністратора перевіряються сервером за Telegram ID.", color = Color(0xFF8D98AA), fontSize = 11.sp)
         Spacer(Modifier.height(20.dp))
     }
 }
