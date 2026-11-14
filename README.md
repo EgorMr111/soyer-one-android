@@ -2,14 +2,25 @@
 
 Native Android application built with Kotlin and Jetpack Compose.
 
-## Included sections
+## Features
 
-- Ukrainian-language SOYER EXCHANGE overview and service information.
-- Demonstration exchange-rate card: 46.50 UAH and 47.70 UAH.
-- USDT ↔ UAH calculator with direction switching and a minimum equivalent of 10 USDT.
-- Local calculation history saved on the device, including date and time.
-- Partnership information, promotions, Telegram channel and manager contact links.
+- Ukrainian-language SOYER EXCHANGE overview.
+- Shared server-managed USDT/UAH rates and minimum amount.
+- USDT ↔ UAH calculator using the current server settings.
+- Local calculation history saved on the device.
+- Company, partnership, promotions and Telegram contact information.
+- Server-backed administrator panel in the **Адмін** tab.
+- Admin login uses the same server-side password as the SOYER EXCHANGE website; no password is embedded in the APK.
+- Admin changes are saved through the SOYER API and are visible to Android users on refresh (the app refreshes settings every 60 seconds).
 - Dark forest-green interface.
+
+## API
+
+The Android client currently connects to:
+
+`https://soyer-exchange-api.onrender.com`
+
+The API server must be deployed from the `EgorMr111/soyer-exchange` repository. The app uses the existing routes `/api/settings`, `/api/admin/login`, `/api/admin/me`, `/api/admin/settings` and `/api/admin/logout`.
 
 ## Build
 
@@ -24,4 +35,4 @@ GitHub Actions builds a debug APK on every push to `main`. The artifact is named
 
 ## Important
 
-This version is informational and demonstrational only. The displayed rates are test values and are not live quotes. The app does not accept payments, connect wallets or exchanges, or execute transfers. The calculator is not an offer to exchange funds. The history is stored locally on the device and is not synchronized to a server.
+The displayed rates are informational quotes and do not execute an exchange. The app does not accept payments, connect wallets or exchanges, or execute transfers. Calculation history is stored locally on the device and is not synchronized.
