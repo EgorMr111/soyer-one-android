@@ -167,7 +167,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, onAdminOp
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(7.dp).clip(CircleShape).background(AccentGreen))
                     Spacer(Modifier.width(7.dp))
-                    Text("SOYER EXCHANGE", color = Muted, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                    Text("ONLINE", color = Muted, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -185,7 +185,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, onAdminOp
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("КУРС ОБМІНУ · ДЕМО", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+            Text("АКТУАЛЬНИЙ КУРС ОБМІНУ", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("USDT → UAH", color = Muted, fontSize = 13.sp)
@@ -208,7 +208,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, onAdminOp
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Green, contentColor = Background)
         ) {
-            Text("Відкрити калькулятор", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            Text("Розрахувати обмін", fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Spacer(Modifier.width(8.dp))
             Icon(Icons.Filled.SwapVert, contentDescription = null)
         }
@@ -316,7 +316,7 @@ fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Surface).padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("ІНДИКАТИВНИЙ КУРС", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             Text(if (direction) "1 USDT = ${formatSoyerRate(settings.rateUsdtToUah)} UAH" else "1 USDT = ${formatSoyerRate(settings.rateUahToUsdt)} UAH", color = Green, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-            Text("Тестові значення для демонстрації інтерфейсу.", color = Muted, fontSize = 11.sp)
+            Text("Остаточний курс та умови підтверджуються менеджером перед обміном.", color = Muted, fontSize = 11.sp)
         }
         Button(
             onClick = {
