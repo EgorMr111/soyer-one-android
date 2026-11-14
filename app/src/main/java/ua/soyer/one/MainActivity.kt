@@ -246,7 +246,7 @@ fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {
     var direction by remember { mutableStateOf(true) }
     var give by remember { mutableStateOf("100") }
     var receive by remember { mutableStateOf("4660") }
-    val rate = if (direction) 46.60 else 1.0 / 47.70
+    val rate = if (direction) 46.50 else 1.0 / 47.70
     val formatter = remember { DecimalFormat("#,##0.00") }
 
     fun updateGive(value: String) {
@@ -283,7 +283,7 @@ fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {
         AmountCard("ОТРИМУЮ", if (direction) "UAH" else "USDT", receive, { updateReceive(it) })
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Surface).padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("ІНДИКАТИВНИЙ КУРС", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-            Text(if (direction) "1 USDT = 46,60 UAH" else "1 USDT = 47,70 UAH", color = Green, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(if (direction) "1 USDT = 46,50 UAH" else "1 USDT = 47,70 UAH", color = Green, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text("Тестові значення для демонстрації інтерфейсу.", color = Muted, fontSize = 11.sp)
         }
         Button(
