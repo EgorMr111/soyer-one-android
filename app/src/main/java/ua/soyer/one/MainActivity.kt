@@ -39,6 +39,7 @@ import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import org.json.JSONObject
 
 private val Background = Color(0xFF080A0F)
 private val Surface = Color(0xFF111722)
@@ -55,12 +56,74 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSoyerCookieManager()
-        setContent { SoyerApp() }
+        setContent { SoyerRoot() }
+    }
+}
+
+
+@Composable
+fun SoyerRoot() {
+    val context = LocalContext.current
+    val preferences = remember { context.getSharedPreferences("soyer_one", android.content.Context.MODE_PRIVATE) }
+    var token by remember { mutableStateOf(preferences.getString("telegram_token", "").orEmpty()) }
+    var firstName by remember { mutableStateOf(preferences.getString("telegram_first_name", "").orEmpty()) }
+    var username by remember { mutableStateOf(preferences.getString("telegram_username", "").orEmpty()) }
+    var telegramId by remember { mutableStateOf(preferences.getString("telegram_id", "").orEmpty()) }
+    var checking by remember { mutableStateOf(token.isNotBlank()) }
+
+    LaunchedEffect(Unit) {
+        if (token.isNotBlank()) {
+            soyerUserToken = token
+            try {
+                val profile = soyerApiRequest("/api/auth/me").optJSONObject("user") ?: throw IllegalStateException("Invalid profile")
+                firstName = profile.optString("firstName")
+                username = profile.optString("username")
+                telegramId = profile.optString("id")
+            } catch (_: Exception) {
+                token = ""
+                soyerUserToken = ""
+                preferences.edit().remove("telegram_token").remove("telegram_first_name")
+                    .remove("telegram_username").remove("telegram_id").apply()
+            }
+        }
+        checking = false
+    }
+
+    when {
+        checking -> Box(Modifier.fillMaxSize().background(Background), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = Green)
+        }
+        token.isBlank() -> TelegramAuthScreen { result ->
+            val newToken = result.optString("token")
+            val profile = result.optJSONObject("user")
+            if (newToken.isNotBlank() && profile != null) {
+                token = newToken
+                soyerUserToken = newToken
+                firstName = profile.optString("firstName")
+                username = profile.optString("username")
+                telegramId = profile.optString("id")
+                preferences.edit().putString("telegram_token", newToken)
+                    .putString("telegram_first_name", firstName)
+                    .putString("telegram_username", username)
+                    .putString("telegram_id", telegramId).apply()
+            }
+        }
+        else -> SoyerApp(
+            telegramName = firstName,
+            telegramUsername = username,
+            telegramId = telegramId,
+            onLogout = {
+                token = ""
+                soyerUserToken = ""
+                preferences.edit().remove("telegram_token").remove("telegram_first_name")
+                    .remove("telegram_username").remove("telegram_id").apply()
+            }
+        )
     }
 }
 
 @Composable
-fun SoyerApp() {
+fun SoyerApp(telegramName: String, telegramUsername: String, telegramId: String, onLogout: () -> Unit) {
     var selectedTab by remember { mutableIntStateOf(0) }
     var settings by remember { mutableStateOf(SoyerSettings()) }
     val context = LocalContext.current
@@ -101,7 +164,8 @@ fun SoyerApp() {
                     val items = listOf(
                         Triple("Головна", Icons.Filled.Home, 0),
                         Triple("Калькулятор", Icons.Filled.Calculate, 1),
-                        Triple("Історія", Icons.Filled.History, 2)
+                        Triple("Історія", Icons.Filled.History, 2),
+                        Triple("Профіль", Icons.Filled.Person, 3)
                     )
                     items.forEach { (label, icon, index) ->
                         NavigationBarItem(
@@ -122,9 +186,10 @@ fun SoyerApp() {
             }
         ) { padding ->
             when (selectedTab) {
-                0 -> HomeScreen(Modifier.padding(padding), onCalculate = { selectedTab = 1 }, onAdminOpen = { selectedTab = 3 }, settings = settings)
+                0 -> HomeScreen(Modifier.padding(padding), onCalculate = { selectedTab = 1 }, onAdminOpen = { selectedTab = 4 }, settings = settings)
                 1 -> CalculatorScreen(Modifier.padding(padding), onSave = ::saveHistory, settings = settings)
                 2 -> HistoryScreen(Modifier.padding(padding), historyItems)
+                3 -> ProfileScreen(Modifier.padding(padding), telegramName, telegramUsername, telegramId, onLogout)
                 else -> AdminPanel(Modifier.padding(padding), current = settings, onSettingsUpdated = { settings = it })
             }
         }
