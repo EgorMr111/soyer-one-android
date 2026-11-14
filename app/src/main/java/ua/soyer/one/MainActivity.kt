@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,6 +45,8 @@ private val Surface = Color(0xFF111722)
 private val SurfaceLight = Color(0xFF151E2B)
 private val Green = Color(0xFF6C8CFF)
 private val GreenDark = Color(0xFF252B55)
+private val Violet = Color(0xFF9C79FF)
+private val AccentGreen = Color(0xFF42D6A0)
 private val MainText = Color(0xFFF5F7FB)
 private val Muted = Color(0xFF8D98AA)
 private val Border = Color(0xFF29334A)
@@ -134,7 +137,9 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, onAdminOp
     var logoTaps by remember { mutableIntStateOf(0) }
     fun openTelegram(username: String) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/$username"))) }
     Column(
-        modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
+        modifier.fillMaxSize()
+            .background(Brush.verticalGradient(listOf(Color(0xFF0D1220), Background, Background, Color(0xFF0A0E16))))
+            .verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Spacer(Modifier.height(16.dp))
@@ -160,9 +165,9 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, onAdminOp
             Spacer(Modifier.weight(1f))
             Box(Modifier.clip(CircleShape).background(Surface).padding(horizontal = 12.dp, vertical = 8.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(7.dp).clip(CircleShape).background(Green))
+                    Box(Modifier.size(7.dp).clip(CircleShape).background(AccentGreen))
                     Spacer(Modifier.width(7.dp))
-                    Text("ДЕМО", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text("SOYER EXCHANGE", color = Muted, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -175,7 +180,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, onAdminOp
 
         Column(
             Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp))
-                .background(SurfaceLight)
+                .background(Brush.linearGradient(listOf(SurfaceLight, Color(0xFF101827), Color(0xFF17182B))))
                 .border(1.dp, Border, RoundedCornerShape(24.dp))
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -186,7 +191,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, onAdminOp
                     Text("USDT → UAH", color = Muted, fontSize = 13.sp)
                     Text("${formatSoyerRate(settings.rateUsdtToUah)} ₴", color = MainText, fontSize = 26.sp, fontWeight = FontWeight.Bold)
                 }
-                Box(Modifier.size(42.dp).clip(CircleShape).background(GreenDark), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(42.dp).clip(CircleShape).background(Brush.linearGradient(listOf(GreenDark, Violet.copy(alpha = 0.45f)))), contentAlignment = Alignment.Center) {
                     Icon(Icons.Filled.SwapVert, contentDescription = null, tint = Green)
                 }
                 Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {
