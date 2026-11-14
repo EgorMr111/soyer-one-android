@@ -34,8 +34,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -347,15 +345,19 @@ fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {
     var give by remember { mutableStateOf("100") }
     var receive by remember { mutableStateOf("4660") }
     val rate = if (direction) settings.rateUsdtToUah else 1.0 / settings.rateUahToUsdt
-    val formatter = remember { DecimalFormat("#,##0.00", DecimalFormatSymbols(Locale.US)) }
-    fun formatAmount(value: Double): String = formatter.format(value).replace(",", " ").replace(".", ",")
-    val giveAmount = give.filterNot { it.isWhitespace() }.replace(',', '.').toDoubleOrNull()
-    val receiveAmount = receive.filterNot { it.isWhitespace() }.replace(',', '.').toDoubleOrNull()
+    // Keep editable amounts ungrouped: grouping separators can be re-parsed as digits
+    // by locale-specific keyboards and turn 500 into 5000000000000.
+    fun parseAmount(value: String): Double? = value.trim().replace(" ", "").replace(',', '.').toDoubleOrNull()
+    fun formatAmount(value: Double): String = if (!value.isFinite()) "" else
+        java.math.BigDecimal.valueOf(value).setScale(2, java.math.RoundingMode.HALF_UP)
+            .stripTrailingZeros().toPlainString().replace('.', ',')
+    val giveAmount = parseAmount(give)
+    val receiveAmount = parseAmount(receive)
     val minimumMet = if (direction) (giveAmount ?: 0.0) >= settings.minimumUsdt else (giveAmount ?: 0.0) >= settings.minimumUsdt * settings.rateUahToUsdt
 
     fun updateGive(value: String) {
         give = value
-        val amount = value.filterNot { it.isWhitespace() }.replace(',', '.').toDoubleOrNull()
+        val amount = parseAmount(value)
         receive = amount?.let { formatAmount(it * rate) } ?: ""
     }
     fun updateReceive(value: String) {
