@@ -39,14 +39,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private val Background = Color(0xFF080D0B)
-private val Surface = Color(0xFF111A16)
-private val SurfaceLight = Color(0xFF18251E)
-private val Green = Color(0xFF20D887)
-private val GreenDark = Color(0xFF123D2B)
-private val MainText = Color(0xFFF2F7F3)
-private val Muted = Color(0xFF91A198)
-private val Border = Color(0xFF26372E)
+private val Background = Color(0xFF080A0F)
+private val Surface = Color(0xFF111722)
+private val SurfaceLight = Color(0xFF151E2B)
+private val Green = Color(0xFF6C8CFF)
+private val GreenDark = Color(0xFF252B55)
+private val MainText = Color(0xFFF5F7FB)
+private val Muted = Color(0xFF8D98AA)
+private val Border = Color(0xFF29334A)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,7 +92,7 @@ fun SoyerApp() {
             containerColor = Background,
             bottomBar = {
                 NavigationBar(
-                    containerColor = Color(0xFF0D1410),
+                    containerColor = Color(0xFF0D121B),
                     contentColor = Muted
                 ) {
                     val items = listOf(
