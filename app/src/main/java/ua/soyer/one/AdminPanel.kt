@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 private const val SOYER_API = "https://soyer-exchange-api.onrender.com"
 private val soyerCookies = CookieManager(null, CookiePolicy.ACCEPT_ALL)
 @Volatile private var soyerAdminToken: String = ""
+@Volatile var soyerUserToken: String = ""
 
 fun installSoyerCookieManager() {
     CookieHandler.setDefault(soyerCookies)
@@ -74,8 +75,11 @@ suspend fun soyerApiRequest(path: String, method: String = "GET", body: JSONObje
             connection.connectTimeout = 65000
             connection.readTimeout = 65000
             connection.setRequestProperty("Accept", "application/json")
-            if (soyerAdminToken.isNotBlank() && path.startsWith("/api/admin/")) {
+            if (path.startsWith("/api/admin/") && soyerAdminToken.isNotBlank()) {
                 connection.setRequestProperty("Authorization", "Bearer $soyerAdminToken")
+            }
+            if (path.startsWith("/api/auth/") && soyerUserToken.isNotBlank()) {
+                connection.setRequestProperty("Authorization", "Bearer $soyerUserToken")
             }
             if (body != null) {
                 connection.doOutput = true
