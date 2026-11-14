@@ -160,7 +160,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, settings:
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Вітаємо у", color = Muted, fontSize = 16.sp)
             Text("SOYER ONE", color = MainText, fontSize = 32.sp, fontWeight = FontWeight.ExtraBold)
-            Text("Ваш простір для зручних розрахунків та інформації про курси.", color = Muted, fontSize = 14.sp, lineHeight = 21.sp)
+            Text(settings.heroText, color = Muted, fontSize = 14.sp, lineHeight = 21.sp)
         }
 
         Column(
@@ -174,17 +174,17 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, settings:
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("USDT → UAH", color = Muted, fontSize = 13.sp)
-                    Text("46,50 ₴", color = MainText, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                    Text("${formatSoyerRate(settings.rateUsdtToUah)} ₴", color = MainText, fontSize = 26.sp, fontWeight = FontWeight.Bold)
                 }
                 Box(Modifier.size(42.dp).clip(CircleShape).background(GreenDark), contentAlignment = Alignment.Center) {
                     Icon(Icons.Filled.SwapVert, contentDescription = null, tint = Green)
                 }
                 Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {
                     Text("UAH → USDT", color = Muted, fontSize = 13.sp)
-                    Text("47,70 ₴", color = MainText, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                    Text("${formatSoyerRate(settings.rateUahToUsdt)} ₴", color = MainText, fontSize = 26.sp, fontWeight = FontWeight.Bold)
                 }
             }
-            Text("47,70 / 46,50 · Мінімум 10 USDT · тестові значення, не актуальна пропозиція.", color = Muted, fontSize = 10.sp)
+            Text("Мінімум ${formatSoyerRate(settings.minimumUsdt)} USDT · Оновлено: ${settings.updatedAt}. Орієнтовні значення.", color = Muted, fontSize = 10.sp)
         }
 
         Button(
@@ -208,9 +208,9 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, settings:
 
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text("ПАРТНЕРСТВО", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
-            Text("Відкриті до співпраці з обмінниками, Telegram-каналами, спільнотами та реферальними командами.", color = MainText, fontSize = 13.sp, lineHeight = 19.sp)
+            Text(settings.partnershipText, color = MainText, fontSize = 13.sp, lineHeight = 19.sp)
             Text("Індивідуальні умови та довгострокова співпраця.", color = Muted, fontSize = 12.sp)
-            OutlinedButton(onClick = { openTelegram("soyermanager") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
+            OutlinedButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(settings.managerUrl))) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
                 Text("Обговорити партнерство")
             }
         }
@@ -220,17 +220,17 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit, settings:
             FeatureRow("Ексклюзивні курси", "Спеціальні пропозиції для клієнтів")
             FeatureRow("Розіграші", "Стежте за оголошеннями в Telegram")
             FeatureRow("Реферальна програма", "Винагороди за рекомендації друзям")
-            OutlinedButton(onClick = { openTelegram("soyerexchangecom") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
+            OutlinedButton(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(settings.exchangeUrl))) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
                 Text("Стежити за оновленнями")
             }
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("ЗВ’ЯЗОК", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
-            Button(onClick = { openTelegram("soyermanager") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Green, contentColor = Background)) {
+            Button(onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(settings.managerUrl))) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Green, contentColor = Background)) {
                 Text("Написати менеджеру", fontWeight = FontWeight.Bold)
             }
-            Text("Проєкти: @soyer_pr", color = Muted, fontSize = 12.sp, modifier = Modifier.clickable { openTelegram("soyer_pr") })
+            Text("Проєкти: @soyer_pr", color = Muted, fontSize = 12.sp, modifier = Modifier.clickable { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(settings.projectsUrl))) })
         }
         Spacer(Modifier.height(16.dp))
     }
@@ -299,7 +299,7 @@ fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {
         AmountCard("ОТРИМУЮ", if (direction) "UAH" else "USDT", receive, { updateReceive(it) })
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Surface).padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("ІНДИКАТИВНИЙ КУРС", color = Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-            Text(if (direction) "1 USDT = 46,50 UAH" else "1 USDT = 47,70 UAH", color = Green, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(if (direction) "1 USDT = ${formatSoyerRate(settings.rateUsdtToUah)} UAH" else "1 USDT = ${formatSoyerRate(settings.rateUahToUsdt)} UAH", color = Green, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text("Тестові значення для демонстрації інтерфейсу.", color = Muted, fontSize = 11.sp)
         }
         Button(
@@ -317,7 +317,7 @@ fun CalculatorScreen(modifier: Modifier = Modifier, onSave: (String) -> Unit = {
             Text("Зберегти розрахунок", fontWeight = FontWeight.Bold)
         }
         if (!minimumMet) {
-            Text("Мінімальна сума — 10 USDT. Змініть суму, щоб зберегти розрахунок.", color = Color(0xFFFFC36B), fontSize = 12.sp, lineHeight = 18.sp)
+            Text("Мінімальна сума — ${formatSoyerRate(settings.minimumUsdt)} USDT. Змініть суму, щоб зберегти розрахунок.", color = Color(0xFFFFC36B), fontSize = 12.sp, lineHeight = 18.sp)
         }
     }
 }
