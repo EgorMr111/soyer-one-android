@@ -1,6 +1,8 @@
 package ua.soyer.one
 
 import android.os.Bundle
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -117,6 +119,8 @@ fun SoyerApp() {
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit) {
+    val context = LocalContext.current
+    fun openTelegram(username: String) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/$username"))) }
     Column(
         modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -154,11 +158,11 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit) {
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("КУРСИ ДЛЯ ПРИКЛАДУ", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+            Text("КУРС ОБМІНУ · ДЕМО", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("USDT → UAH", color = Muted, fontSize = 13.sp)
-                    Text("46,60 ₴", color = MainText, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                    Text("46,50 ₴", color = MainText, fontSize = 26.sp, fontWeight = FontWeight.Bold)
                 }
                 Box(Modifier.size(42.dp).clip(CircleShape).background(GreenDark), contentAlignment = Alignment.Center) {
                     Icon(Icons.Filled.SwapVert, contentDescription = null, tint = Green)
@@ -168,7 +172,7 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit) {
                     Text("47,70 ₴", color = MainText, fontSize = 26.sp, fontWeight = FontWeight.Bold)
                 }
             }
-            Text("Демонстраційні значення. Не є актуальною фінансовою пропозицією.", color = Muted, fontSize = 10.sp)
+            Text("47,70 / 46,50 · Мінімум 10 USDT · тестові значення, не актуальна пропозиція.", color = Muted, fontSize = 10.sp)
         }
 
         Button(
@@ -183,10 +187,38 @@ fun HomeScreen(modifier: Modifier = Modifier, onCalculate: () -> Unit) {
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("ПЕРЕВАГИ", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
-            FeatureRow("Зручний інтерфейс", "Усі основні розділи в одному місці")
-            FeatureRow("Швидкий розрахунок", "Змінюйте будь-яке поле калькулятора")
-            FeatureRow("Підтримка", "Інформація для зв’язку з командою")
+            Text("ПРО SOYER EXCHANGE", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+            FeatureRow("Зручність", "USDT через блокчейн-мережі або UID бірж")
+            FeatureRow("Особисті рахунки", "Перекази з особистих рахунків команди")
+            FeatureRow("Прозорі умови", "Курс та умови погоджуються перед угодою")
+            FeatureRow("Гнучкість", "Можливість P2P за попереднім погодженням")
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("ПАРТНЕРСТВО", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+            Text("Відкриті до співпраці з обмінниками, Telegram-каналами, спільнотами та реферальними командами.", color = MainText, fontSize = 13.sp, lineHeight = 19.sp)
+            Text("Індивідуальні умови та довгострокова співпраця.", color = Muted, fontSize = 12.sp)
+            OutlinedButton(onClick = { openTelegram("soyermanager") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
+                Text("Обговорити партнерство")
+            }
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("АКЦІЇ ТА БОНУСИ", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+            FeatureRow("Ексклюзивні курси", "Спеціальні пропозиції для клієнтів")
+            FeatureRow("Розіграші", "Стежте за оголошеннями в Telegram")
+            FeatureRow("Реферальна програма", "Винагороди за рекомендації друзям")
+            OutlinedButton(onClick = { openTelegram("soyerexchangecom") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
+                Text("Стежити за оновленнями")
+            }
+        }
+
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("ЗВ’ЯЗОК", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+            Button(onClick = { openTelegram("soyermanager") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Green, contentColor = Background)) {
+                Text("Написати менеджеру", fontWeight = FontWeight.Bold)
+            }
+            Text("Проєкти: @soyer_pr", color = Muted, fontSize = 12.sp, modifier = Modifier.clickable { openTelegram("soyer_pr") })
         }
         Spacer(Modifier.height(16.dp))
     }
