@@ -149,18 +149,18 @@ fun AdminPanel(
         verticalArrangement = Arrangement.spacedBy(13.dp)
     ) {
         Spacer(Modifier.height(8.dp))
-        Text("Адмін-панель", color = Color(0xFFF2F7F3), fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
+        Text("Адмін-панель", color = Color(0xFFF5F7FB), fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
         Text(
             "Керування SOYER EXCHANGE. Зміни публікуються на сервері та синхронізуються для користувачів.",
-            color = Color(0xFF91A198), fontSize = 13.sp, lineHeight = 19.sp
+            color = Color(0xFF8D98AA), fontSize = 13.sp, lineHeight = 19.sp
         )
 
         if (!authenticated) {
             Column(
-                Modifier.fillMaxWidth().background(Color(0xFF111A16), RoundedCornerShape(18.dp)).padding(18.dp),
+                Modifier.fillMaxWidth().background(Color(0xFF111722), RoundedCornerShape(18.dp)).padding(18.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("Вхід адміністратора", color = Color(0xFFF2F7F3), fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                Text("Вхід адміністратора", color = Color(0xFFF5F7FB), fontWeight = FontWeight.Bold, fontSize = 17.sp)
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
@@ -186,7 +186,7 @@ fun AdminPanel(
                     },
                     enabled = password.isNotBlank() && !busy,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF20D887), contentColor = Color(0xFF080D0B))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6C8CFF), contentColor = Color(0xFF080A0F))
                 ) { Text(if (busy) "Перевірка..." else "Увійти") }
             }
         } else {
@@ -240,7 +240,7 @@ fun AdminPanel(
                 },
                 enabled = !busy,
                 modifier = Modifier.fillMaxWidth().height(54.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF20D887), contentColor = Color(0xFF080D0B))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6C8CFF), contentColor = Color(0xFF080A0F))
             ) { Text(if (busy) "Збереження..." else "Зберегти зміни", fontWeight = FontWeight.Bold) }
 
             OutlinedButton(
@@ -260,8 +260,8 @@ fun AdminPanel(
             ) { Text("Вийти") }
         }
         if (error.isNotBlank()) Text(error, color = Color(0xFFFF9A9A), fontSize = 12.sp)
-        if (message.isNotBlank()) Text(message, color = Color(0xFF20D887), fontSize = 12.sp)
-        Text("Пароль перевіряється сервером і не зберігається в APK.", color = Color(0xFF91A198), fontSize = 11.sp)
+        if (message.isNotBlank()) Text(message, color = Color(0xFF6C8CFF), fontSize = 12.sp)
+        Text("Пароль перевіряється сервером і не зберігається в APK.", color = Color(0xFF8D98AA), fontSize = 11.sp)
         Spacer(Modifier.height(20.dp))
     }
 }
